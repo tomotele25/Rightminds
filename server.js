@@ -12,6 +12,7 @@ app.use(express.json());
 const allowedOrigins = [
   "http://localhost:3000",
   "https://rightminds.vercel.com",
+  "https://rightminds-academy-kx9k.vercel.app/",
 ];
 
 app.use(

@@ -98,4 +98,10 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Logout controller
+const logOut = async (req, res) => {
+  try {
+  } catch (error) {}
+};
+
 module.exports = { signupUser, loginUser };
