@@ -2,17 +2,17 @@ require("dotenv").config();
 
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const user = require("../models/user");
 const jwt = require("jsonwebtoken");
+const user = require("../models/user");
 const jwtsecret = process.env.JWT_SECRET_KEY;
 
 // register controller
 const signupUser = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-    console.log("details: ", email, password);
+    const { email, password, role, userName } = req.body;
+    // console.log("details: ", email, password, userName);
     const checkExistingUser = await User.findOne({
-      $or: [{ email }, { password }],
+      $or: [{ email }, { password }, { userName }],
     });
 
     if (checkExistingUser) {
@@ -29,6 +29,7 @@ const signupUser = async (req, res) => {
       email,
       password: hashedPassword,
       role: role || "student",
+      username: userName,
     });
 
     await newlyCreatedUser.save();
@@ -48,10 +49,10 @@ const signupUser = async (req, res) => {
       .json({ success: false, message: "some error occured please try again" });
   }
 };
-
 // Login controller
 const loginUser = async (req, res) => {
   console.log("jwt secret: ", jwtsecret);
+
   try {
     const { email, password, role } = req.body;
     const accessToken = jwt.sign(
@@ -88,6 +89,7 @@ const loginUser = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
+      accessToken,
     });
   } catch (error) {
     console.log(error);
@@ -98,10 +100,27 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Logout controller
-const logOut = async (req, res) => {
+const getUserName = async (req, res) => {
   try {
-  } catch (error) {}
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ message: "Username is required" });
+    }
+
+    console.log("username:", username);
+
+    const checkExistingUserName = await User.findOne({ username });
+
+    if (!checkExistingUserName) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user: checkExistingUserName });
+  } catch (error) {
+    console.error("Could not get username:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
-module.exports = { signupUser, loginUser };
+module.exports = { signupUser, loginUser, getUserName };

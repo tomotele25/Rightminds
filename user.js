@@ -1,1 +1,0 @@
-const credentials = { email: "e@gmail.com", password: "smssmmsmsms" };
