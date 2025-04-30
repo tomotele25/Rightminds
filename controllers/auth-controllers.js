@@ -9,7 +9,7 @@ const jwtsecret = process.env.JWT_SECRET_KEY;
 // register controller
 
 const signupUser = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password, role, username } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({
@@ -19,9 +19,7 @@ const signupUser = async (req, res) => {
   }
 
   try {
-    const existingUser = await User.findOne({ email });
-    console.log(email);
-
+    const existingUser = await User.findOne({ email, username });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -36,6 +34,7 @@ const signupUser = async (req, res) => {
       email,
       password: hashedPassword,
       role: role || "student",
+      username,
     });
 
     await newUser.save();
@@ -46,13 +45,6 @@ const signupUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error during signup:", error);
-
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: "Duplicate entry. Please check the details.",
-      });
-    }
 
     return res.status(500).json({
       success: false,
