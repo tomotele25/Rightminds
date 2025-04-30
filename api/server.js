@@ -15,7 +15,7 @@ const startServer = async () => {
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://rightminds.vercel.com",
+  "https://rightminds-academy-risy.vercel.app",
   "https://rightminds-academy-risy",
 ];
 
