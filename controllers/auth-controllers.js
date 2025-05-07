@@ -6,8 +6,7 @@ const jwt = require("jsonwebtoken");
 const user = require("../models/user");
 const jwtsecret = process.env.JWT_SECRET_KEY;
 
-// register controller
-
+// Register controller
 const signupUser = async (req, res) => {
   const { email, password, role, username } = req.body;
 
@@ -19,7 +18,7 @@ const signupUser = async (req, res) => {
   }
 
   try {
-    const existingUser = await User.findOne({ email, username });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -39,9 +38,14 @@ const signupUser = async (req, res) => {
 
     await newUser.save();
 
+    // Send welcome email
+    await sendWelcomeEmail(newUser);
+
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
+      accessToken,
+      user: existingUser,
     });
   } catch (error) {
     console.error("Error during signup:", error);
@@ -56,23 +60,10 @@ const signupUser = async (req, res) => {
 
 // Login controller
 const loginUser = async (req, res) => {
-  console.log("jwt secret: ", jwtsecret);
-
   try {
-    const { email, password, role } = req.body;
-    const accessToken = jwt.sign(
-      {
-        userId: user._id,
-        email: email,
-        role: role || "student",
-      },
-      jwtsecret
-    );
+    const { email, password } = req.body;
 
-    const checkExistingUser = await User.findOne({
-      email,
-    });
-
+    const checkExistingUser = await User.findOne({ email });
     if (!checkExistingUser) {
       return res.status(400).json({
         success: false,
@@ -84,48 +75,34 @@ const loginUser = async (req, res) => {
       password,
       checkExistingUser.password
     );
-    // console.log("is valid: ", password, checkExistingUser.password);
     if (!isPasswordValid) {
       return res.status(400).json({
         success: false,
         message: "Wrong credentials",
       });
     }
+    const accessToken = jwt.sign(
+      {
+        id: checkExistingUser.id,
+        email: checkExistingUser.email,
+        role: checkExistingUser.role,
+      },
+      jwtsecret
+    );
+
     return res.status(200).json({
       success: true,
       message: "Login successful",
+      user: checkExistingUser,
       accessToken,
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       success: false,
-      message: "some error occured please try again",
+      message: "Some error occurred, please try again",
     });
   }
 };
 
-const getUserName = async (req, res) => {
-  try {
-    const { username } = req.body;
-
-    if (!username) {
-      return res.status(400).json({ message: "Username is required" });
-    }
-
-    console.log("username:", username);
-
-    const checkExistingUserName = await User.findOne({ username });
-
-    if (!checkExistingUserName) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({ user: checkExistingUserName });
-  } catch (error) {
-    console.error("Could not get username:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-module.exports = { signupUser, loginUser, getUserName };
+module.exports = { signupUser, loginUser };

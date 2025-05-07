@@ -5,7 +5,7 @@ const PORT = 5001;
 const connectToDb = require("../database/db");
 const authRoutes = require("../routers/auth-routes");
 const cors = require("cors");
-const userRoute = require("../routers/userRoute");
+// const userRoute = require("../routers/userRoute");
 const startServer = async () => {
   connectToDb();
   app.listen(PORT, () => {
@@ -35,11 +35,12 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoute);
+// app.use("/api/user", userRoute);
 app.get("/", (req, res) => {
   console.log("test reached");
   res.send("Hello world!");
   //   return;
 });
+
 startServer();
 module.exports = app;

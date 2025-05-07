@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
-      lowerCase: true,
+      lowercase: true,
     },
     password: {
       type: String,
@@ -22,8 +22,27 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    firstname: {
+      type: String,
+      lowercase: true,
+    },
+    lastname: {
+      type: String,
+      lowercase: true,
+    },
+    contact: {
+      type: String,
+      lowercase: true,
+    },
+    bio: {
+      type: String,
+      lowercase: true,
+    },
+    userIsLoggedIn: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model("User", UserSchema);
