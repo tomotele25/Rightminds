@@ -4,6 +4,9 @@ const app = express();
 const PORT = 5001;
 const connectToDb = require("../database/db");
 const authRoutes = require("../routers/auth-routes");
+const studentRoutes = require("../routers/student-route");
+const teacherRoutes = require("../routers/teachers-route");
+const cleanupRoute = require("../routers/cleanup-Route");
 const cors = require("cors");
 // const userRoute = require("../routers/userRoute");
 const startServer = async () => {
@@ -35,11 +38,12 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
-// app.use("/api/user", userRoute);
+app.use("/api", studentRoutes);
+app.use("/api", teacherRoutes);
+app.use("/api", cleanupRoute);
 app.get("/", (req, res) => {
   console.log("test reached");
   res.send("Hello world!");
-  //   return;
 });
 
 startServer();

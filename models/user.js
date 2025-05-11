@@ -41,6 +41,11 @@ const UserSchema = new mongoose.Schema(
     userIsLoggedIn: {
       type: Boolean,
     },
+    // school_id: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "School",
+    //   required: true,
+    // },
   },
   { timestamps: true }
 );
