@@ -5,7 +5,8 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const user = require("../models/user");
 const jwtsecret = process.env.JWT_SECRET_KEY;
-
+const Announcement = require("../models/announcement");
+const Course = require("../models/course");
 // Register controller
 const signupUser = async (req, res) => {
   const { email, password, role, username, firstname, lastname } = req.body;
@@ -125,6 +126,8 @@ const getTotalNumberOfStudent = async (req, res) => {
     });
   }
 };
+
+// Get the total number of all teachers
 const getTotalNumberOfTeachers = async (req, res) => {
   try {
     const totalTeachers = await User.countDocuments({ role: "teacher" }); // not "students"
@@ -141,6 +144,8 @@ const getTotalNumberOfTeachers = async (req, res) => {
     });
   }
 };
+
+// Get the data of all students
 const getAllStudents = async (req, res) => {
   try {
     const studentsData = await User.find({ role: "student" }).select(
@@ -167,6 +172,8 @@ const getAllStudents = async (req, res) => {
     });
   }
 };
+
+// Get the data of all teachers
 const getAllTeachers = async (req, res) => {
   try {
     const teachersData = await User.find({ role: "teacher" }).select(
@@ -193,6 +200,8 @@ const getAllTeachers = async (req, res) => {
     });
   }
 };
+
+// Delete People without first name and lastname
 const deleteUsersWithoutNames = async (req, res) => {
   try {
     const result = await User.deleteMany({
@@ -214,6 +223,8 @@ const deleteUsersWithoutNames = async (req, res) => {
     });
   }
 };
+
+// Delete an individual by their ID
 const deleteUserById = async (req, res) => {
   const { id } = req.params;
 
@@ -286,6 +297,151 @@ const createTeachers = async (req, res) => {
   }
 };
 
+// Announcement
+
+const createAnouncement = async (req, res) => {
+  const { title, message, audience, postedBy } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "No token provided",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    // Check role
+    if (decoded.role !== "teacher" && decoded.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Access denied. Only teachers or admins can create announcements",
+      });
+    }
+
+    // Create announcement
+    const newAnnouncement = new Announcement({
+      title,
+      message,
+      audience,
+      postedBy: decoded.id,
+    });
+
+    await newAnnouncement.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Announcement created successfully",
+      data: newAnnouncement,
+    });
+  } catch (error) {
+    console.error("Error creating announcement:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create announcement",
+    });
+  }
+};
+// Get anouncements
+const getAnnouncements = async (req, res) => {
+  try {
+    const announcements = await Announcement.find().sort({ createdAt: -1 });
+    res.status(200).json({
+      status: true,
+      data: announcements,
+    });
+  } catch (error) {
+    console.error("Error fetching announcements:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Failed to fetch announcements" });
+  }
+};
+
+// Create Course
+const createCourse = async (req, res) => {
+  const {
+    title,
+    description,
+    type,
+    level,
+    instructor,
+    department,
+    link,
+    pdfUrl,
+    videoUrl,
+  } = req.body;
+
+  if (!title || !description || !type || !level || !instructor || !department) {
+    return res
+      .status(401)
+      .json({ success: false, message: "All fields are required" });
+  }
+
+  // Ensure that pdfUrl is provided if type is pdf, and videoUrl if type is video
+  if (type === "pdf" && !pdfUrl) {
+    return res
+      .status(401)
+      .json({ success: false, message: "PDF URL is required for PDF courses" });
+  }
+
+  if (type === "video" && !videoUrl) {
+    return res.status(401).json({
+      success: false,
+      message: "Video URL is required for video courses",
+    });
+  }
+
+  try {
+    // Add course to database
+    const course = new Course({
+      title,
+      description,
+      level,
+      department,
+      type,
+      pdfUrl: type === "pdf" ? pdfUrl : null,
+      videoUrl: type === "video" ? videoUrl : null,
+      instructor,
+    });
+
+    await course.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Course created successfully", course });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error creating course",
+      error: error.message,
+    });
+  }
+};
+
+const getCourses = async (req, res) => {
+  try {
+    const courses = await Course.find().sort({ createdAt: -1 }); // Most recent first
+    res.status(200).json({ success: true, courses });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching courses",
+      error: error.message,
+    });
+  }
+};
+
+// const getTotalNumberOfCourses = async (req,res ) =>{
+//   try {
+//     const courses = await Course.countDocuments()
+//   } catch (error) {
+
+//   }
+// }
+
 module.exports = {
   signupUser,
   loginUser,
@@ -296,4 +452,8 @@ module.exports = {
   getAllTeachers,
   deleteUsersWithoutNames,
   deleteUserById,
+  createAnouncement,
+  getAnnouncements,
+  createCourse,
+  getCourses,
 };

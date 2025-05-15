@@ -7,6 +7,8 @@ const authRoutes = require("../routers/auth-routes");
 const studentRoutes = require("../routers/student-route");
 const teacherRoutes = require("../routers/teachers-route");
 const cleanupRoute = require("../routers/cleanup-Route");
+const anouncementRoute = require("../routers/anouncement-routes");
+const createCourseRoute = require("../routers/course");
 const cors = require("cors");
 // const userRoute = require("../routers/userRoute");
 const startServer = async () => {
@@ -41,6 +43,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api", studentRoutes);
 app.use("/api", teacherRoutes);
 app.use("/api", cleanupRoute);
+app.use("/api", anouncementRoute);
+app.use("/api", createCourseRoute);
 app.get("/", (req, res) => {
   console.log("test reached");
   res.send("Hello world!");
