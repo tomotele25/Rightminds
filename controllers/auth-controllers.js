@@ -151,6 +151,7 @@ const loginUser = async (req, res) => {
         role: checkExistingUser.role,
         firstname: checkExistingUser.firstname,
         lastname: checkExistingUser.lastname,
+        username: checkExistingUser.username,
       },
       jwtsecret
     );
