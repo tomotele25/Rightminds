@@ -8,6 +8,72 @@ const jwtsecret = process.env.JWT_SECRET_KEY;
 const Announcement = require("../models/announcement");
 const Course = require("../models/course");
 // Register controller
+// const signupUser = async (req, res) => {
+//   const { email, password, role, username, firstname, lastname } = req.body;
+
+//   if (!email || !password) {
+//     return res.status(400).json({
+//       success: false,
+//       message: "Email and password are required",
+//     });
+//   }
+
+//   try {
+//     const existingUser = await User.findOne({ email });
+//     if (existingUser) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "User already exists with the same email",
+//       });
+//     }
+
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedPassword = await bcrypt.hash(password, salt);
+
+//     const newUser = new User({
+//       email,
+//       password: hashedPassword,
+//       role: role || "student",
+//       username,
+//       firstname,
+//       lastname,
+//     });
+
+//     await newUser.save();
+
+//     // email
+//     await sendEmail({
+//       to: email,
+//       subject: "Welcome to Learnova 🎉",
+//       html: `
+//         <h2>Hi ${firstname || username},</h2>
+//         <p>Welcome to Learnova!</p>
+//         <p>Your account was created successfully. You can now log in and start exploring courses.</p>
+//         <br />
+//         <p>The Learnova Team</p>
+//       `,
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "User registered successfully. Welcome email sent.",
+//     });
+//   } catch (error) {
+//     console.error("Error during signup:", error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Some error occurred. Please try again.",
+//       error: error.message,
+//     });
+//   }
+// };
+// Login controller
+
+//
+
+//
+
 const signupUser = async (req, res) => {
   const { email, password, role, username, firstname, lastname } = req.body;
 
@@ -56,7 +122,6 @@ const signupUser = async (req, res) => {
   }
 };
 
-// Login controller
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -84,6 +149,8 @@ const loginUser = async (req, res) => {
         id: checkExistingUser.id,
         email: checkExistingUser.email,
         role: checkExistingUser.role,
+        firstname: checkExistingUser.firstname,
+        lastname: checkExistingUser.lastname,
       },
       jwtsecret
     );

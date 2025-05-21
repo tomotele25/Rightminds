@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema(
     userIsLoggedIn: {
       type: Boolean,
     },
+    isUserSubscribed: {
+      type: Boolean,
+      default: false,
+    },
     // school_id: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "School",
