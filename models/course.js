@@ -20,15 +20,18 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: function () {
         return this.type === "pdf";
-      }, // pdfUrl is required if type is 'pdf'
+      },
     },
     videoUrl: {
       type: String,
       required: function () {
         return this.type === "video";
-      }, // videoUrl is required if type is 'video'
+      },
     },
-    instructor: { type: String, required: true },
+    image: {
+      type: String, // just the URL of the uploaded image
+      required: true,
+    },
   },
   { timestamps: true }
 );

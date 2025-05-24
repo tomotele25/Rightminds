@@ -45,10 +45,14 @@ app.use("/api", teacherRoutes);
 app.use("/api", cleanupRoute);
 app.use("/api", anouncementRoute);
 app.use("/api", createCourseRoute);
+app.use("/uploads", express.static("uploads"));
 app.get("/", (req, res) => {
   console.log("test reached");
   res.send("Hello world!");
 });
+// app.post("/api/uploadFile", (req, res) => {
+//   res.send("upload successful");
+// });
 
 startServer();
 module.exports = app;
