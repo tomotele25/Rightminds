@@ -1,7 +1,8 @@
+// controllers/uploadController.js
+
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, "../uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -38,10 +39,10 @@ const uploadImage = (req, res) => {
       });
     }
 
-    // Use BACKENDURL to build image URL
-    const imageUrl = `${
-      "https://rightmindsbackend.vercel.app" || "http://localhost:5001"
-    }/uploads/${req.file.filename}`;
+    // Build a public URL (you can modify this if using CDN or Cloudinary)
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
 
     res.status(200).json({
       success: true,
