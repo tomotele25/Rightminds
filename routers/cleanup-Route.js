@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { deleteUsersWithoutNames } = require("../controllers/auth-controllers");
-const { deleteUserById } = require("../controllers/auth-controllers");
+const { deleteUsersWithoutNames } = require("../controllers/user-controller");
+const { deleteUserById } = require("../controllers/user-controller");
 
 router.delete("/users/cleanup", deleteUsersWithoutNames);
 

@@ -4,7 +4,7 @@ const {
   getTotalNumberOfTeachers,
   createTeachers,
   getAllTeachers,
-} = require("../controllers/auth-controllers");
+} = require("../controllers/teachers-controller");
 
 router.get("/totalteachers", getTotalNumberOfTeachers);
 router.post("/createteachers", createTeachers);

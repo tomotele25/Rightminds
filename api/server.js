@@ -9,6 +9,9 @@ const teacherRoutes = require("../routers/teachers-route");
 const cleanupRoute = require("../routers/cleanup-Route");
 const anouncementRoute = require("../routers/anouncement-routes");
 const createCourseRoute = require("../routers/course");
+const createQuizRoute = require("../routers/quiz");
+const levelRoute = require("../routers/level-route");
+const departmentRoute = require("../routers/department-route");
 const cors = require("cors");
 // const userRoute = require("../routers/userRoute");
 const startServer = async () => {
@@ -45,6 +48,9 @@ app.use("/api", teacherRoutes);
 app.use("/api", cleanupRoute);
 app.use("/api", anouncementRoute);
 app.use("/api", createCourseRoute);
+app.use("/api", createQuizRoute);
+app.use("/api", departmentRoute);
+app.use("/api", levelRoute);
 app.use("/uploads", express.static("uploads"));
 app.get("/", (req, res) => {
   console.log("test reached");

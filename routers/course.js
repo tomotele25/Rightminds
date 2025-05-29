@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { createCourse, getCourses } = require("../controllers/auth-controllers");
+const {
+  createCourse,
+  getCourses,
+} = require("../controllers/course-controller");
 
 router.get("/getCourses", getCourses);
 

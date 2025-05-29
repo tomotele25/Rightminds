@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   getTotalNumberOfStudent,
   getAllStudents,
-} = require("../controllers/auth-controllers");
+} = require("../controllers/students-controller");
 
 router.get("/students", getTotalNumberOfStudent);
 router.get("/students/data", getAllStudents);

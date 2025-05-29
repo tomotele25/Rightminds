@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   createAnouncement,
   getAnnouncements,
-} = require("../controllers/auth-controllers");
+} = require("../controllers/announcement-controller");
 
 router.post("/anouncement", createAnouncement);
 router.get("/getAnnouncements", getAnnouncements);
