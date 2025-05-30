@@ -12,7 +12,7 @@ const createTeachers = async (req, res) => {
 
   try {
     // Check if user already exists by email
-    const checkExistingUser = await user.findOne({ email });
+    const checkExistingUser = await User.findOne({ email });
     if (checkExistingUser) {
       return res
         .status(400)
@@ -24,7 +24,7 @@ const createTeachers = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create a new teacher
-    const createNewTeacher = new user({
+    const createNewTeacher = new User({
       email,
       firstname,
       lastname,
