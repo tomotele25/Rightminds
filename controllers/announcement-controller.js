@@ -1,4 +1,6 @@
 const Announcement = require("../models/announcement");
+const jwt = require("jsonwebtoken");
+
 const createAnouncement = async (req, res) => {
   const { title, message, audience, postedBy } = req.body;
   const token = req.headers.authorization?.split(" ")[1];
