@@ -1,5 +1,5 @@
 const User = require("../models/user");
-
+const bcrypt = require("bcryptjs");
 const createTeachers = async (req, res) => {
   const { firstname, lastname, email, password, contact, username } = req.body;
 
