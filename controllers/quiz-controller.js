@@ -1,5 +1,6 @@
 const Quiz = require("../models/quiz");
-
+const express = require("express");
+const router = express.Router();
 const createQuiz = async (req, res) => {
   const { title, department, course, level, questions } = req.body;
 

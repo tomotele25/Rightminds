@@ -43,4 +43,35 @@ const deleteUserById = async (req, res) => {
   }
 };
 
-module.exports = { deleteUserById, deleteUsersWithoutNames };
+const updateUser = async (req, res) => {
+  const userId = req.User.id;
+  const { firstname, lastname, username, contact, bio } = req.body;
+  try {
+    const payload = { firstname, lastname, contact, bio };
+    if (!firstname || !lastname || !username || !contact || !bio) {
+      re.status(401).json({
+        success: false,
+        message: "All fields are required ",
+      });
+    }
+
+    const updatedUser = User.findByIdAndUpdate(userId, payload, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      updateUser,
+    });
+  } catch (error) {
+    console.log("Could not update user", error.message);
+    res.status(500).json({ success: false, message: "Error from server " });
+  }
+};
+
+module.exports = { deleteUserById, deleteUsersWithoutNames, updateUser };

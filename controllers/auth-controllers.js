@@ -60,38 +60,55 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const checkExistingUser = await User.findOne({ email });
-    if (!checkExistingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Wrong credentials",
-      });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Wrong credentials" });
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      checkExistingUser.password
-    );
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({
-        success: false,
-        message: "Wrong credentials",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Wrong credentials" });
     }
+
+    // Create access token
     const accessToken = jwt.sign(
       {
-        id: checkExistingUser.id,
-        email: checkExistingUser.email,
-        role: checkExistingUser.role,
+        id: user.id,
+        email: user.email,
+        role: user.role,
       },
-      jwtsecret
+      jwtsecret,
+      { expiresIn: "15m" } // e.g., 15 minutes expiry
     );
+
+    // Create refresh token
+    const refreshToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_REFRESH_SECRET_KEY,
+      { expiresIn: "7d" } // e.g., 7 days expiry
+    );
+
+    // Save refresh token to user in DB
+    user.refreshToken = refreshToken;
+    await user.save();
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      user: checkExistingUser,
+      user: {
+        id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
       accessToken,
+      refreshToken,
     });
   } catch (error) {
     console.log(error);
@@ -102,4 +119,59 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, loginUser };
+const refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh Token Required" });
+  }
+
+  try {
+    // Verify refresh token signature and expiration
+    const payload = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET_KEY
+    );
+
+    // Find user by ID
+    const user = await User.findById(payload.id);
+
+    // Check if user exists and refresh token matches
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(403).json({ message: "Invalid Refresh Token" });
+    }
+
+    // Issue new access token
+    const newAccessToken = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "15m" }
+    );
+
+    // Issue new refresh token and save it
+    const newRefreshToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_REFRESH_SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired refresh token" });
+  }
+};
+
+module.exports = { signupUser, loginUser, refreshToken };

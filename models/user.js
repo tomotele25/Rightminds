@@ -45,12 +45,14 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    refreshToken: { type: String },
     // school_id: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "School",
     //   required: true,
     // },
   },
+
   { timestamps: true }
 );
 
