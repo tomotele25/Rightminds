@@ -1,4 +1,5 @@
 const User = require("../models/user");
+
 const deleteUsersWithoutNames = async (req, res) => {
   try {
     const result = await User.deleteMany({
