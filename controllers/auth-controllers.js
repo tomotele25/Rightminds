@@ -3,7 +3,7 @@ require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
-
+const sendSignupEmail = require("../mailer");
 const jwtsecret = process.env.JWT_SECRET_KEY;
 
 // Register controller
@@ -40,6 +40,11 @@ const signupUser = async (req, res) => {
     });
 
     await newUser.save();
+    try {
+      await sendSignupEmail(email, firstname);
+    } catch (err) {
+      console.error("Email failed:", err);
+    }
 
     return res.status(201).json({
       success: true,
