@@ -1,6 +1,5 @@
 const Quiz = require("../models/quiz");
-const express = require("express");
-
+const Progress = require("../models/progress");
 const createQuiz = async (req, res) => {
   try {
     const { title, course, duration, level, department, questions } = req.body;
