@@ -46,11 +46,7 @@ const UserSchema = new mongoose.Schema(
       default: false,
     },
     refreshToken: { type: String },
-    // school_id: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "School",
-    //   required: true,
-    // },
+    badge: { type: String, default: null },
   },
 
   { timestamps: true }

@@ -12,6 +12,7 @@ const createCourseRoute = require("../routers/course");
 const createQuizRoute = require("../routers/quiz");
 const levelRoute = require("../routers/level-route");
 const departmentRoute = require("../routers/department-route");
+const activityRoute = require("../routers/acitivity-route");
 const cors = require("cors");
 // const userRoute = require("../routers/userRoute");
 const startServer = async () => {
@@ -51,6 +52,7 @@ app.use("/api", createCourseRoute);
 app.use("/api", createQuizRoute);
 app.use("/api", departmentRoute);
 app.use("/api", levelRoute);
+app.use("/api", activityRoute);
 app.use("/uploads", express.static("uploads"));
 app.get("/", (req, res) => {
   console.log("test reached");

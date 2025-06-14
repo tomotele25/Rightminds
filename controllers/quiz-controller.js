@@ -74,7 +74,6 @@ const submitQuiz = async (req, res) => {
     let correct = 0;
     let wrong = 0;
 
-    // Check answers
     answers.forEach(({ questionId, answer }) => {
       const question = quiz.questions.id(questionId);
       if (question) {
@@ -89,14 +88,30 @@ const submitQuiz = async (req, res) => {
     const total = correct + wrong;
     const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
 
-    // Save result
+    // Save result to quiz.results
     quiz.results.push({
       studentId,
       score: percentage,
       finishTime: new Date().toISOString(),
     });
-
     await quiz.save();
+
+    // Also save this attempt in Progress
+    const courseId = quiz.courseId; // assuming quiz has a courseId field
+
+    await Progress.findOneAndUpdate(
+      { studentId, courseId },
+      {
+        $push: {
+          quizAttempts: {
+            score: percentage,
+            date: new Date(),
+          },
+        },
+        $set: { lastUpdated: Date.now() },
+      },
+      { new: true, upsert: true } // create if doesn't exist
+    );
 
     res.status(200).json({
       success: true,

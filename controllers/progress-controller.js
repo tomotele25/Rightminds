@@ -14,10 +14,6 @@ const getStudentProgress = async (req, res) => {
 
         if (studentResults.length === 0) return null;
 
-        const latestResult = studentResults.reduce((a, b) =>
-          new Date(a.finishTime) > new Date(b.finishTime) ? a : b
-        );
-
         return {
           quizId: quiz._id,
           title: quiz.title,
@@ -25,8 +21,10 @@ const getStudentProgress = async (req, res) => {
           department: quiz.department,
           status: "Completed",
           progress: 100,
-          score: latestResult.score,
-          finishTime: latestResult.finishTime,
+          attempts: studentResults.map((r) => ({
+            score: r.score,
+            finishTime: r.finishTime,
+          })),
         };
       })
       .filter(Boolean);
