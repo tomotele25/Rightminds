@@ -1,44 +1,58 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
-const sendSignupEmail = async (to, name) => {
-  try {
-    const data = await resend.emails.send({
-      from: "Rightminds Academy <onboarding@resend.dev>", // ✅ Use this for testing
-      to,
-      subject: "🎉 Welcome to Rightminds Academy!",
-      html: `
-        <div style="font-family: 'Segoe UI', sans-serif; background-color: #f9fafb; padding: 40px;">
-          <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);">
-            <div style="background-color: #1f2937; padding: 24px;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Welcome to Rightminds, ${name}!</h1>
-            </div>
-            <div style="padding: 24px;">
-              <p style="font-size: 16px; color: #333;">We're thrilled to have you join our learning community! 🚀</p>
-              <p style="font-size: 15px; color: #555;">
-                At <strong>Rightminds Academy</strong>, you're not just here to learn — you're here to grow, connect, and lead.
-                Dive into your dashboard to start learning and engaging with others.
-              </p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="https://rightminds-academy-risy.vercel.app/" 
-                   style="background-color: #2563eb; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold;">
-                  Go to Dashboard
-                </a>
-              </div>
-              <p style="font-size: 14px; color: #666;">Need help? Just reply to this email — we're always here for you.</p>
-            </div>
-            <div style="background-color: #f1f5f9; padding: 16px; text-align: center; font-size: 13px; color: #999;">
-              &copy; ${new Date().getFullYear()} Rightminds Academy. All rights reserved.
-            </div>
-          </div>
+const sendSignupEmail = async (to, subject) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    // Plain text fallback
+    text: "Welcome to Learnova!",
+    // HTML version of the email
+    html: `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9fafb; padding: 40px 20px;">
+      <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 30px;">
+        <h2 style="text-align: center; color: #4f46e5;">Welcome to <span style="color: #10b981;">Learnova</span> 🎓</h2>
+        <p style="font-size: 16px; color: #374151; line-height: 1.6;">
+          Hello there,
+          <br/><br/>
+          We're thrilled to have you as part of the Learnova community! 🚀
+          Whether you're here to level up your skills or explore something new, you're in the right place.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="https://learnova.com" style="background-color: #10b981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+            Start Learning
+          </a>
         </div>
-      `,
-    });
+        <p style="font-size: 14px; color: #6b7280; line-height: 1.6;">
+          If you have any questions, feel free to reply to this email. We're always here to help.
+          <br/><br/>
+          Cheers, <br/>
+          The Learnova Team
+        </p>
+      </div>
+      <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 20px;">
+        &copy; ${new Date().getFullYear()} Learnova. All rights reserved.
+      </p>
+    </div>
+  `,
+  };
 
-    console.log("Email sent!", data);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent:", info.response);
+    return { success: true };
   } catch (error) {
-    console.error("Failed to send email:", error);
+    console.error("Error sending email:", error);
+    return { success: false, error };
   }
 };
 
