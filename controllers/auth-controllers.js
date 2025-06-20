@@ -181,9 +181,9 @@ const refreshToken = async (req, res) => {
 };
 
 const forgetPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
+  const { email } = req.body;
 
+  try {
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -214,8 +214,9 @@ const forgetPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
+  const { password } = req.body;
+
   try {
-    const { password } = req.body;
     const hashedToken = crypto
       .createHash("sha256")
       .update(req.params.token)
@@ -226,22 +227,25 @@ const resetPassword = async (req, res) => {
       resetTokenExpires: { $gt: Date.now() },
     });
 
-    if (!user)
+    if (!user) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid or expired token" });
+    }
 
     const salt = 10;
-
     user.password = await bcrypt.hash(password, salt);
+
+    user.resetToken = undefined;
+    user.resetTokenExpires = undefined;
 
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: "Password has been reseted successfully",
+      message: "Password has been reset successfully",
     });
-  } catch (error) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
