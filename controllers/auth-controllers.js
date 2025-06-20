@@ -181,9 +181,9 @@ const refreshToken = async (req, res) => {
 };
 
 const forgetPassword = async (req, res) => {
-  const { email } = req.body;
-
   try {
+    const { email } = req.body;
+
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -219,7 +219,7 @@ const resetPassword = async (req, res) => {
   try {
     const hashedToken = crypto
       .createHash("sha256")
-      .update(req.params.token)
+      .update(req.params.resetToken)
       .digest("hex");
 
     const user = await User.findOne({

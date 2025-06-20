@@ -58,7 +58,7 @@ const sendSignupEmail = async (to, subject) => {
 
 const sendForgotPasswordEmail = async (to, token) => {
   const FRONTEND_URL = process.env.FRONTEND_URL;
-  const resetLink = `${FRONTEND_URL}/reset/${token}`;
+  const resetLink = `http://localhost:3000/reset/${token}`;
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
