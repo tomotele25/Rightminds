@@ -13,6 +13,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     role: {
       type: String,
       enum: ["student", "teacher", "admin"],
@@ -47,6 +48,14 @@ const UserSchema = new mongoose.Schema(
     },
     refreshToken: { type: String },
     badge: { type: String, default: null },
+    resetToken: {
+      type: String,
+      default: null,
+    },
+    resetTokenExpires: {
+      type: Date,
+      default: null,
+    },
   },
 
   { timestamps: true }

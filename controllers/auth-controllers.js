@@ -3,9 +3,10 @@ require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
-const sendSignupEmail = require("../mailer");
-const jwtsecret = process.env.JWT_SECRET_KEY;
+const { sendSignupEmail, sendForgotPasswordEmail } = require("../mailer");
 
+const jwtsecret = process.env.JWT_SECRET_KEY;
+const crypto = require("crypto");
 // Register controller
 
 const signupUser = async (req, res) => {
@@ -179,4 +180,77 @@ const refreshToken = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, loginUser, refreshToken };
+const forgetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetToken = token;
+    user.resetTokenExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+
+    await user.save();
+
+    await sendForgotPasswordEmail(email, token);
+
+    res.status(200).json({
+      success: true,
+      message: "Reset link sent to your email",
+    });
+  } catch (error) {
+    console.error("Forget password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const password = req.body;
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetToken: hashedToken,
+      resetTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired token" });
+
+    const salt = 10;
+
+    user.password = await bcrypt.hash(password, salt);
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password has been reseted successfully",
+    });
+  } catch (error) {
+    console.error(err);
+    res.status(500).json({ message: "Server error. Please try again later." });
+  }
+};
+
+module.exports = {
+  signupUser,
+  loginUser,
+  refreshToken,
+  forgetPassword,
+  resetPassword,
+};

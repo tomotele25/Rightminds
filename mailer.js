@@ -56,4 +56,38 @@ const sendSignupEmail = async (to, subject) => {
   }
 };
 
-module.exports = sendSignupEmail;
+const sendForgotPasswordEmail = async (to, token) => {
+  const resetLink = `http://localhost:3000/ResetPass/${token}`;
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject: "Reset your Learnova password",
+    text: "Click the link to reset your password",
+    html: `
+      <div style="font-family:sans-serif;background:#f9fafb;padding:30px;">
+        <div style="max-width:600px;margin:auto;background:#fff;padding:30px;border-radius:8px;">
+          <h2 style="color:#4f46e5;">Reset Your Password</h2>
+          <p>Click the button below to reset your password:</p>
+          <div style="margin:20px 0;">
+            <a href="${resetLink}" style="background:#10b981;color:#fff;padding:12px 20px;text-decoration:none;border-radius:5px;">Reset Password</a>
+          </div>
+          <p>This link expires in 15 minutes. If you didn’t request a reset, ignore this email.</p>
+        </div>
+      </div>
+    `,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Reset email sent:", info.response);
+    return { success: true };
+  } catch (error) {
+    console.error("Reset email error:", error);
+    return { success: false, error };
+  }
+};
+
+module.exports = {
+  sendSignupEmail,
+  sendForgotPasswordEmail,
+};
