@@ -215,7 +215,7 @@ const forgetPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const password = req.body;
+    const { password } = req.body;
     const hashedToken = crypto
       .createHash("sha256")
       .update(req.params.token)
