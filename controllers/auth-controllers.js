@@ -192,14 +192,18 @@ const forgetPassword = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    const token = crypto.randomBytes(32).toString("hex");
-    user.resetToken = token;
-    user.resetTokenExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
 
+    user.resetToken = hashedToken;
+    user.resetTokenExpires = Date.now() + 15 * 60 * 1000; // 15 mins
     await user.save();
 
-    await sendForgotPasswordEmail(email, token);
-
+    // Send raw token in the email
+    await sendForgotPasswordEmail(email, rawToken);
     res.status(200).json({
       success: true,
       message: "Reset link sent to your email",
